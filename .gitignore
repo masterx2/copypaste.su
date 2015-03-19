@@ -1,0 +1,7 @@
+.cache
+.bash_history
+.idea
+composer.phar
+composer.lock
+vendor
+
