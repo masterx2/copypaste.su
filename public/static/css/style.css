@@ -1,0 +1,52 @@
+#wrap {
+    width: 1000px;
+    margin: auto;
+}
+
+.cat-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cat-list li {
+    margin-bottom: 5px;
+}
+
+.cat-title {
+    display: inline-block;
+    width: 200px;
+    font-family: monospace;
+    color: gray;
+}
+
+#short {
+    margin-left: 5px;
+}
+
+.links_stat {
+    float: left;
+    margin-right: 30px;
+    font-family: Arial;
+    font-size: 15px;
+}
+
+.links_stat a {
+    font-family: monospace;
+    font-size: 10px;
+    color: rgb(123, 10, 178);
+    text-decoration: none;
+}
+
+.last_click {
+    font-size: 10px;
+    float: right;
+    margin-left: 30px;
+    margin-top: 4px;
+    color: dimgrey;
+}
+
+.count {
+    color: rgb(33, 158, 73);
+    font-weight: bold;
+}
