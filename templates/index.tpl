@@ -27,7 +27,7 @@
             <ol>
             {foreach $last_links as $link}
             <li>
-                <a href="http://cppt.su/{$link.id}" target="_blank">{$link.url}</a>
+                <a href="http://cppt.su/{$link.url}" target="_blank">{$link.url}</a>
                 <span class="count">{$link.click_count}</span>
                 <span class="origin">{$link.original_url|urldecode|truncate:20:"..."}</span>
                 <span class="last_click">{$link.last_click}</span>
@@ -40,7 +40,7 @@
             <ol>
             {foreach $top_links as $link}
             <li>
-                <a href="http://cppt.su/{$link.id}" target="_blank">{$link.url}</a>
+                <a href="http://cppt.su/{$link.url}" target="_blank">{$link.url}</a>
                 <span class="count">{$link.click_count}</span>
                 <span class="origin">{$link.original_url|urldecode|truncate:20:"..."}</span>
                 <span class="last_click">{$link.last_click}</span>
