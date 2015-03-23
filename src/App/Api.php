@@ -68,11 +68,11 @@ class Api {
 	}
 
 	public static function id2url($id) {
-		return convBase($id, '0123456789', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz');
+		return self::convBase($id, '0123456789', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz');
 	}
 
 	public static function url2id($url) {
-		return convBase($url, '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', '0123456789');
+		return self::convBase($url, '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', '0123456789');
 	}
 
 	private static function convBase($numberInput, $fromBaseInput, $toBaseInput) {
