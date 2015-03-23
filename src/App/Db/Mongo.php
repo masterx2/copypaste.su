@@ -50,7 +50,7 @@ class Mongo {
 		return self::$db->selectCollection($collection)->findAndModify($query, $update, $fields, $options);
 	}
 
-	private static function getNextSequence($name){
+	public static function getNextSequence($name){
         $retval = self::findAndModify('counters',
             ['_id' => $name],
             ['$inc' => ["seq" => 1]],
