@@ -11,7 +11,8 @@ class Api {
 			$result = Mongo::insert('links', [
 				'type' => 'url',
 				'original_url' => $url,
-				'id' => self::id2url($id),
+				'url' => self::id2url($id),
+				'id' => $id,
 				'click_count' => 0,
 				'last_click' => new \MongoDate() 
 			]);
@@ -27,9 +28,9 @@ class Api {
 		}
 	}
 
-	public static function followShortUrl($id) {
+	public static function followShortUrl($url) {
 		$result = Mongo::findAndModify('links', [
-				'id' => $id,
+				'url' => $url,
 				'type' => 'url'
 			], [
 				'$inc' => ['click_count' => 1],
