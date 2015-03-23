@@ -53,7 +53,7 @@ class Mongo {
 	public static function getNextSequence($name){
         $retval = self::findAndModify('counters',
             ['_id' => $name],
-            ['$inc' => ["seq" => 1]],
+            ['$inc' => ["seq" => 0]],
             null,
             ["new" => true]
         );
