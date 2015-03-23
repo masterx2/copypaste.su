@@ -1,7 +1,7 @@
 $(function(){
     $('#short').click(function(){
         var url = $('#urlbox').val();
-        if (url) {
+        if (url && url.indexOf('cppt.ru') == -1) {
             $.ajax({
                 url: document.location.origin + "/api/short",
                 cache: false,
