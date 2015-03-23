@@ -10,7 +10,7 @@ $(function(){
                 dataType: 'json',
                 success: function(data) {
                     if (data.success) {
-                        $('#urlbox').val('cppt.su/'+data.id);
+                        $('#urlbox').val('cppt.su/'+data.url);
                     } else {
                         alert(data.message);
                     }

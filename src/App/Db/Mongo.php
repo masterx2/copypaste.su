@@ -45,10 +45,28 @@ class Mongo {
 		return self::$db->selectCollection($collection)->findOne($query);
 	}
 
-	public static function findAndModify($collection, $query, $update) {
+	public static function findAndModify($collection, $query, $update, $fields=null, $options=null) {
 		self::checkAndConnect();
-		return self::$db->selectCollection($collection)->findAndModify($query, $update);
+		return self::$db->selectCollection($collection)->findAndModify($query, $update, $fields, $options);
 	}
+
+	private static function getNextSequence($name){
+        $retval = self::findAndModify('counters',
+            ['_id' => $name],
+            ['$inc' => ["seq" => 1]],
+            null,
+            ["new" => true]
+        );
+
+        if (!isset($retval['seq'])) {
+            self::insert('counters', [
+                '_id' => $name,
+                'seq' => 1
+            ]);
+            return self::getNextSequence($name);
+        }
+        return $retval['seq'];
+    }
 
 	public static function clearMongo($data) {
         if(is_array($data)) {
