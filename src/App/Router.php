@@ -32,7 +32,15 @@ class Router {
                 switch ($url) {
                     case 'api/short':
                         // Сюда будет стучатсься AJAX'ом
-                        Api::getShortUrl();
+                        Api::getShortUrl('url');
+                        break;
+                    case 'api/uploadFile':
+                        // Загружаем
+                        Api::uploadFile();
+                        break;
+                    case 'api/debug':
+                        // Дебаг методов
+                        echo Api::uploadFile();
                         break;
                     default:
                         // Для дебага

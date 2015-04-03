@@ -1,16 +1,17 @@
 <?php
+
 namespace App;
 
 use App\Db\Mongo;
 
 class Api {
-	public static function getShortUrl() {
+	public static function getShortUrl($type, $raw_url=null) {
 		if (isset($_POST['url'])) {
 			$id = Mongo::getNextSequence('link');
-			$url = urlencode($_POST['url']);
+			$url = isset($raw_url) ? $raw_url : $_POST['url'];
 			$result = Mongo::insert('links', [
-				'type' => 'url',
-				'original_url' => $url,
+				'type' => $type,
+				'original_url' => urlencode($url),
 				'url' => self::id2url($id),
 				'id' => $id,
 				'click_count' => 0,
@@ -30,8 +31,7 @@ class Api {
 
 	public static function followShortUrl($url) {
 		$result = Mongo::findAndModify('links', [
-				'url' => $url,
-				'type' => 'url'
+				'url' => $url
 			], [
 				'$inc' => ['click_count' => 1],
 				'$set' => ['last_click' => new \MongoDate()]
@@ -45,7 +45,7 @@ class Api {
 	}
 
 	public static function getLastLinks($num) {
-		$result = Mongo::find('links', ['type'=>'url'], ['_id' => -1], $num);
+		$result = Mongo::find('links', [], ['_id' => -1], $num);
 		if ($result) {
 			return [
 				'success' => true,
@@ -56,8 +56,127 @@ class Api {
 		}
 	}
 
+    public static function uploadFile() {
+    	$file = $_FILES['cppt_file'];
+
+    	// {
+    	//     "name":"file.png",
+    	//     "type":"image/png",
+    	// 	   "tmp_name":"/tmp/phpYvYMFP",
+    	// 	   "error":0,
+    	// 	   "size":31217}
+    	// }
+
+    	if ($file['error'] == 0) {
+    		list($key, $url) = self::getApiParams();
+	    	
+	    	if ($key && $url) {
+			    $headers = [
+					"X-Auth-Token: $key",
+					"X-Delete-After: 172800"
+				];
+
+				$file_res = fopen($file['tmp_name'], 'r');
+
+				var_dump($file_res);
+
+				$options = [
+		        	CURLOPT_RETURNTRANSFER => true,
+					CURLOPT_HEADER         => true,
+					CURLOPT_PUT			   => true,
+					CURLOPT_INFILE		   => $file_res,
+					CURLOPT_INFILESIZE	   => $file['size']
+		        ];
+
+				$response = self::parseHeader(
+					self::HTTP($url.'Storage/'.urlencode($file['name']), $headers, $options)
+				);
+
+				fclose($file_res);
+			}
+    	}
+    }
+
+    public static function getApiParams() {
+    	$redis = new \Redis();
+    	$redis->connect('localhost');
+    	$auth_key = $redis->get('storage_api_key');
+    	$auth_url = $redis->get('storage_api_url');
+
+    	if (!$auth_key) {
+
+    		$headers = [
+    			"X-Auth-User:36471_cppt",
+    			"X-Auth-Key:eVeelvP7Zz"
+    		];
+
+    		$options = [
+    			CURLOPT_HEADER         => true,
+	        	CURLOPT_RETURNTRANSFER => true
+	        ];
+
+    		$response = self::parseHeader(self::HTTP('https://auth.selcdn.ru/', $headers, $options));
+    		
+    		if (isset($response['error'])) {
+    			return false;
+    		} else if (isset($response['status']) && $response['status'] == 204){
+    			if (isset($response['headers']) && array_key_exists('X-Auth-Token', $response['headers'])) {
+    				$auth_key = $response['headers']['X-Auth-Token'];
+    				$auth_url = $response['headers']['X-Storage-Url'];
+    				$key_ttl = intval($response['headers']['X-Expire-Auth-Token']);
+    				$redis->set('storage_api_key', $auth_key, $key_ttl);
+    				$redis->set('storage_api_url', $auth_url, $key_ttl);
+    			}
+    		}
+    	}
+    	return $auth_key;
+    }
+
+    public static function HTTP($url, $headers=[], $custom_options=[]) {
+		$curl = curl_init();
+		$options = array_replace([
+	        CURLOPT_HTTPHEADER	   => $headers,
+			CURLOPT_URL 		   => $url,
+	        CURLOPT_CONNECTTIMEOUT => 120,
+	        CURLOPT_TIMEOUT        => 120
+	    ], $custom_options);
+		curl_setopt_array($curl, $options);
+		$response = curl_exec($curl);
+		return $response;
+    }
+
+    public static function parseHeader($response) {
+	    // Parse Response
+		$raw_headers = explode("\n", trim($response));
+		if (isset($raw_headers[0])) {	
+			// Parse status string
+			$status = array_shift($raw_headers);
+			preg_match('/^([A-Z]+)\/([0-9.]{3,5}) ([0-9]{3}) (.+)$/', $status, $preg_result);
+			array_shift($preg_result);
+			list($protocol_type, $protocol_version, $status_code, $status_message) = $preg_result;
+			if (isset($protocol_type, $protocol_version, $status_code, $status_message)) {
+    			$headers = array_reduce($raw_headers, function($accum, $item) {
+    				$accum[strstr($item, ': ', true)] = trim(substr(strstr($item, ': '), 2));
+    				return $accum;
+    			}, []);
+
+    			return [
+    				'status' => intval($status_code),
+    				'protocol' => $protocol_type,
+    				'version' => $protocol_version,
+    				'status_message' => $status_message,
+    				'headers' => $headers
+    			];
+			} else {
+				return ['error' => 'Bad status string'];
+			}
+		} else {
+			return ['error' => 'Bad header format'];
+		}
+    }
+
 	public static function getTopLinks($num) {
-		$result = Mongo::find('links', ['type'=>'url'], ['click_count' => -1], $num);
+		$result = Mongo::find('links', [], ['click_count' => -1], $num);
 		if ($result) {
 			return [
 				'success' => true,

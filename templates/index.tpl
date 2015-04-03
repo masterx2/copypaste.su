@@ -15,12 +15,9 @@
             <li><span class="cat-title">Url Shortener</span>
             <input type="text" id="urlbox"/><button id="short">Short</button>
             </li>
-            <!-- <li><span class="cat-title">Image Hosting Service</span>
+            <li><span class="cat-title">File Hosting</span>
             <input type="file" id="imagebox"/>
             </li>
-            <li><span class="cat-title">File Hosting Service</span>
-            <input type="file" id="filebox"/>
-            </li> -->
         </ul>
         <div id="last_links" class="links_stat">
             <h3>20 Last Links</h3>

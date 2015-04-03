@@ -1,9 +1,9 @@
 {
     "require": {
-	"fenom/fenom": "dev-master"
+        "fenom/fenom": "dev-master",
+        "fhteam/selectel-storage-api": "dev-master"
     },
     "autoload": {
         "psr-0": {"App\\": "src/"}
     }
 }
-

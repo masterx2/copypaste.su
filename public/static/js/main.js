@@ -1,5 +1,37 @@
 $(function(){
     $('#short').click(function(){
+        short();
+    });
+
+    $('#urlbox').keyup(function(e) {
+        if (e.keyCode == 13) {
+            short();
+        }
+    })
+
+    $('#imagebox').change(function () {
+        var file = $(this).prop('files')[0],
+            data = new FormData();
+
+        if (file.size < 30e6) {  
+            data.append('cppt_file', file)
+            $.ajax({
+                url: document.location.origin + "/api/uploadFile",
+                type: 'POST',
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                data: data,
+                success: function (response) {
+                    console.log(response);
+                }
+            });
+        } else {
+            alert('File too large, 30Mb Max!');
+        }
+    })
+
+    function short() {
         var url = $('#urlbox').val();
         if (url && url.indexOf('cppt.su') == -1) {
             $.ajax({
@@ -20,7 +52,7 @@ $(function(){
         } else {
             alert('Nothing to short!');
         }
-    });
+    }
 
     $('.last_click').each(function(i,v){
         $(v).text(moment(parseInt($(v).text())*1e3).fromNow());
