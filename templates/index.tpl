@@ -23,10 +23,16 @@
             <h3>20 Last Links</h3>
             <ol>
             {foreach $last_links as $link}
-            <li>
+            <li class="{$link.type}">
                 <a href="http://cppt.su/{$link.url}" target="_blank">{$link.url}</a>
                 <span class="count">{$link.click_count}</span>
-                <span class="origin">{$link.original_url|urldecode|truncate:20:"..."}</span>
+                <span class="origin">
+                    {if $link.type == 'file'} 
+                        {$link.original_url|urldecode|substr:33}
+                    {else}
+                        {$link.original_url|urldecode|truncate:20:"..."}
+                    {/if}
+                </span>
                 <span class="last_click">{$link.last_click}</span>
             </li>
             {/foreach}
@@ -36,10 +42,16 @@
             <h3>20 Top Links</h3>
             <ol>
             {foreach $top_links as $link}
-            <li>
+            <li class="{$link.type}">
                 <a href="http://cppt.su/{$link.url}" target="_blank">{$link.url}</a>
                 <span class="count">{$link.click_count}</span>
-                <span class="origin">{$link.original_url|urldecode|truncate:20:"..."}</span>
+                <span class="origin">
+                    {if $link.type == 'file'} 
+                        {$link.original_url|urldecode|substr:33}
+                    {else}
+                        {$link.original_url|urldecode|truncate:20:"..."}
+                    {/if}
+                </span>
                 <span class="last_click">{$link.last_click}</span>
             </li>
             {/foreach}

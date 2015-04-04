@@ -6,7 +6,7 @@ use App\Db\Mongo;
 
 class Api {
 	public static function getShortUrl($type, $raw_url=null) {
-		if (isset($_POST['url'])) {
+		if (isset($_POST['url']) || isset($raw_url)) {
 			$id = Mongo::getNextSequence('link');
 			$url = isset($raw_url) ? $raw_url : $_POST['url'];
 			$result = Mongo::insert('links', [
@@ -58,28 +58,15 @@ class Api {
 
     public static function uploadFile() {
     	$file = $_FILES['cppt_file'];
-
-    	// {
-    	//     "name":"file.png",
-    	//     "type":"image/png",
-    	// 	   "tmp_name":"/tmp/phpYvYMFP",
-    	// 	   "error":0,
-    	// 	   "size":31217}
-    	// }
-
     	if ($file['error'] == 0) {
     		list($key, $url) = self::getApiParams();
-	    	
-	    	if ($key && $url) {
+	    	if (isset($key, $url)) {
 			    $headers = [
 					"X-Auth-Token: $key",
 					"X-Delete-After: 172800"
 				];
-
+				$real_filename = urlencode($file['name']);
 				$file_res = fopen($file['tmp_name'], 'r');
-
-				var_dump($file_res);
-
 				$options = [
 		        	CURLOPT_RETURNTRANSFER => true,
 					CURLOPT_HEADER         => true,
@@ -88,11 +75,17 @@ class Api {
 					CURLOPT_INFILESIZE	   => $file['size']
 		        ];
 
+		        $upload_url = $url.'Storage/'.$real_filename;
 				$response = self::parseHeader(
-					self::HTTP($url.'Storage/'.urlencode($file['name']), $headers, $options)
+					self::HTTP($upload_url, $headers, $options)
 				);
-
 				fclose($file_res);
+				
+				if (isset($response['error'])) {
+					self::ajaxResponse(self::_error('Error parsing response: '.$response['error']));
+				} else if ($response['status'] == 201) {
+					self::getShortUrl('file', $upload_url);
+				}
 			}
     	}
     }
@@ -100,11 +93,11 @@ class Api {
     public static function getApiParams() {
     	$redis = new \Redis();
     	$redis->connect('localhost');
+
     	$auth_key = $redis->get('storage_api_key');
     	$auth_url = $redis->get('storage_api_url');
 
     	if (!$auth_key) {
-
     		$headers = [
     			"X-Auth-User:36471_cppt",
     			"X-Auth-Key:eVeelvP7Zz"
@@ -129,7 +122,7 @@ class Api {
     			}
     		}
     	}
-    	return $auth_key;
+    	return [$auth_key, $auth_url];
     }
 
     public static function HTTP($url, $headers=[], $custom_options=[]) {
@@ -154,6 +147,12 @@ class Api {
 			preg_match('/^([A-Z]+)\/([0-9.]{3,5}) ([0-9]{3}) (.+)$/', $status, $preg_result);
 			array_shift($preg_result);
 			list($protocol_type, $protocol_version, $status_code, $status_message) = $preg_result;
+
+			// HTTP/1.1 100 Continue\r\n
+			if (intval($status_code) == 100) {
+				return self::parseHeader(implode("\n",array_filter($raw_headers)));
+			}
+
 			if (isset($protocol_type, $protocol_version, $status_code, $status_message)) {
     			$headers = array_reduce($raw_headers, function($accum, $item) {
     				$accum[strstr($item, ': ', true)] = trim(substr(strstr($item, ': '), 2));
@@ -173,6 +172,7 @@ class Api {
 		} else {
 			return ['error' => 'Bad header format'];
 		}
+		return ['error' => 'This is not a header'];
     }
 
 	public static function getTopLinks($num) {

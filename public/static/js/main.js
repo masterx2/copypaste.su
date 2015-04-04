@@ -15,6 +15,7 @@ $(function(){
 
         if (file.size < 30e6) {  
             data.append('cppt_file', file)
+            $('#urlbox').val('Uploading file...');
             $.ajax({
                 url: document.location.origin + "/api/uploadFile",
                 type: 'POST',
@@ -22,8 +23,12 @@ $(function(){
                 contentType: false,
                 dataType: 'json',
                 data: data,
-                success: function (response) {
-                    console.log(response);
+                success: function (data) {
+                    if (data.success) {
+                        $('#urlbox').val('cppt.su/'+data.url);
+                    } else {
+                        alert(data.message);
+                    }
                 }
             });
         } else {

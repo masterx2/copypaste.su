@@ -40,7 +40,6 @@ class Router {
                         break;
                     case 'api/debug':
                         // Дебаг методов
-                        echo Api::uploadFile();
                         break;
                     default:
                         // Для дебага

@@ -80,3 +80,11 @@ h1 {
     font-family: Monospace;
     color: rgb(123, 123, 255);
 }
+
+.file a {
+    background: rgb(195, 85, 71);
+}
+
+.file a:hover {
+    background: rgb(79, 1, 1);
+}
