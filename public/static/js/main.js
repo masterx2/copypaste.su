@@ -10,8 +10,12 @@ $(function(){
     })
 
     $('#imagebox').change(function () {
-        var file = $(this).prop('files')[0],
-            data = new FormData();
+        var file = $(this).prop('files')[0];
+        uploadFile(file);
+    })
+
+    function uploadFile(file) {
+        var data = new FormData();
 
         if (file.size < 30e6) {  
             data.append('cppt_file', file)
@@ -29,12 +33,18 @@ $(function(){
                     } else {
                         alert(data.message);
                     }
+
+                    $('#drop-area').css({
+                        'border-color': '#F0A196',
+                        background: 'none',
+                        color: 'black'
+                    });
                 }
             });
         } else {
             alert('File too large, 30Mb Max!');
         }
-    })
+    }
 
     function short() {
         var url = $('#urlbox').val();
@@ -62,4 +72,41 @@ $(function(){
     $('.last_click').each(function(i,v){
         $(v).text(moment(parseInt($(v).text())*1e3).fromNow());
     });
-})
+
+    // File Drop-Area
+    $('#drop-area').on('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    $('#drop-area').on('dragenter', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).css({
+            'border-color': '#740303',
+            background: '#C35547',
+            color: 'white'
+        });
+    });
+
+    $('#drop-area').on('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).css({
+            'border-color': '#F0A196',
+            background: 'none',
+            color: 'black'
+        });
+    });
+
+
+    $('#drop-area').on('drop', function (e) {
+        if(e.originalEvent.dataTransfer){
+            if(e.originalEvent.dataTransfer.files.length) {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadFile(e.originalEvent.dataTransfer.files[0]);
+            }   
+        }
+    });
+});

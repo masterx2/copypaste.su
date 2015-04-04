@@ -37,20 +37,28 @@
     color: rgb(255, 255, 255);
     text-decoration: none;
     background: rgb(72, 72, 255);
-    padding: 2px 6px;
+    padding: 2px 4px;
+    width: 20px;
+    display: block;
+    text-align: center;
+    border-radius: 3px;
+    float: left;
+    margin-right: 5px;
 }
 
 .last_click {
     font-size: 10px;
     float: right;
     margin-left: 30px;
-    margin-top: 4px;
+    margin-right: 10px;
+    line-height: 22px;
     color: dimgrey;
 }
 
 .count {
-    color: rgb(33, 158, 73);
+    color: rgb(171, 171, 171);
     font-weight: bold;
+    line-height: 22px;
 }
 
 .links_stat a:hover {
@@ -60,6 +68,7 @@
 .links_stat li {
     margin-bottom: 7px;
     list-style: none;
+    border-radius: 3px;
 }
 
 .links_stat ol {
@@ -74,6 +83,13 @@
 
 #urlbox {
     width: 350px;
+    padding: 4px 7px;
+    font-family: monospace;
+    color: rgb(64, 23, 255);
+    border: 1px solid rgb(72, 72, 255);
+    margin-bottom: 10px;
+    margin-right: 5px;
+    border-radius: 4px;
 }
 
 h1 {
@@ -87,4 +103,52 @@ h1 {
 
 .file a:hover {
     background: rgb(79, 1, 1);
+}
+
+.links_stat ol li:nth-child(odd) {
+    background: rgb(231, 231, 231);
+}
+
+#drop-area {
+    width:300px;
+    height:100px;
+    line-height:100px;
+    border: 5px dashed #F0A196;
+    font-family: Monospace;
+    font-size: 20px;
+    text-align:center;
+    border-radius: 5px;
+    margin-left: 124px;
+    margin-top: 5px;
+}
+
+#urlbox:focus {
+    outline: 0;
+    box-shadow: 0 0 10px rgb(202, 209, 255);
+    border: 1px solid rgb(207, 207, 255);
+}
+
+button {
+    border: 1px solid rgb(111, 111, 255);
+    background: white;
+    padding: 4px 10px;
+    border-radius: 5px;
+    color: white;
+    background: rgb(111, 111, 255);
+    cursor: pointer;
+}
+
+button:focus {
+    outline: 0;
+    box-shadow: 0 0 6px rgb(111, 111, 255);
+}
+
+button:hover {
+    background: rgb(79, 79, 210);
+}
+
+#imagebox {
+    background: rgb(240, 161, 150);
+    color: white;
+    border-radius: 3px;
 }

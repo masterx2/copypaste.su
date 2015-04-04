@@ -17,10 +17,11 @@
             </li>
             <li><span class="cat-title">File Hosting</span>
             <input type="file" id="imagebox"/>
+            <div id="drop-area">Drop here</div>
             </li>
         </ul>
         <div id="last_links" class="links_stat">
-            <h3>20 Last Links</h3>
+            <h3>10 Last Links</h3>
             <ol>
             {foreach $last_links as $link}
             <li class="{$link.type}">
@@ -28,7 +29,7 @@
                 <span class="count">{$link.click_count}</span>
                 <span class="origin">
                     {if $link.type == 'file'} 
-                        {$link.original_url|urldecode|substr:33}
+                        {$link.original_url|urldecode|substr:33|truncate:20:"..."}
                     {else}
                         {$link.original_url|urldecode|truncate:20:"..."}
                     {/if}
@@ -39,7 +40,7 @@
             </ol>
         </div>
         <div id="top_links" class="links_stat">
-            <h3>20 Top Links</h3>
+            <h3>10 Top Links</h3>
             <ol>
             {foreach $top_links as $link}
             <li class="{$link.type}">

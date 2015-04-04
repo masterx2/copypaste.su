@@ -12,7 +12,7 @@ class Router {
         Mongo::setDb('copypaste');
 
         self::$fenom = \Fenom::factory('../templates', '../templates/cache', [
-        	'force_compile' => true,
+            'force_compile' => true,
             'strip' => true
         ]);
         
@@ -57,8 +57,8 @@ class Router {
 
     public static function indexPage() {
         // Две выборки, последнии ссылки и топ-ссылок по 10 штук
-        $last_links = Api::getLastLinks(20)['data'];
-        $top_links = Api::getTopLinks(20)['data'];
+        $last_links = Api::getLastLinks(10)['data'];
+        $top_links = Api::getTopLinks(10)['data'];
 
         self::$fenom->display('index.tpl',[
             'last_links' => $last_links,
