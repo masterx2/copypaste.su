@@ -1,5 +1,9 @@
+body {
+  background: rgb(20, 27, 24);
+}
+
 #wrap {
-    width: 1000px;
+    width: 700px;
     margin: auto;
 }
 
@@ -7,6 +11,8 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    margin-bottom: 20px;
+    margin-left: 72px;
 }
 
 .cat-list li {
@@ -15,9 +21,11 @@
 
 .cat-title {
     display: inline-block;
-    width: 120px;
+    width: 90px;
+    padding-left: 12px;
     font-family: monospace;
-    color: gray;
+    color: #00D881;
+    text-shadow: 0 0 1px #00D881;
 }
 
 #short {
@@ -26,9 +34,9 @@
 
 .links_stat {
     float: left;
-    margin-right: 30px;
     font-family: Arial;
     font-size: 15px;
+    width: 45%;
 }
 
 .links_stat a {
@@ -36,7 +44,7 @@
     font-size: 15px;
     color: rgb(255, 255, 255);
     text-decoration: none;
-    background: rgb(72, 72, 255);
+    background: #303C73;
     padding: 2px 4px;
     width: 20px;
     display: block;
@@ -49,25 +57,26 @@
 .last_click {
     font-size: 10px;
     float: right;
-    margin-left: 30px;
     margin-right: 10px;
     line-height: 22px;
-    color: dimgrey;
+    color: #4E8970;
 }
 
 .count {
-    color: rgb(171, 171, 171);
+    color: #336650;
     font-weight: bold;
     line-height: 22px;
 }
 
 .links_stat a:hover {
-    background: rgb(0, 26, 107);
+    background: #2A2F47;
 }
 
 .links_stat li {
     margin-bottom: 7px;
     list-style: none;
+    color: #149F67;
+    font-size: 13px;
     border-radius: 3px;
 }
 
@@ -78,15 +87,17 @@
 
 .links_stat h3 {
     margin: 15px 0px 10px 0px;
-    color: rgb(46, 128, 255);
+    color: #B58E32;
+    text-align: center;
 }
 
 #urlbox {
     width: 350px;
     padding: 4px 7px;
     font-family: monospace;
-    color: rgb(64, 23, 255);
-    border: 1px solid rgb(72, 72, 255);
+    color: #00D881;
+    border: 1px solid #00D881;
+    background: #264739;
     margin-bottom: 10px;
     margin-right: 5px;
     border-radius: 4px;
@@ -94,61 +105,136 @@
 
 h1 {
     font-family: Monospace;
-    color: rgb(123, 123, 255);
+    color: #00D881;
+    text-shadow: 0 0 2px #00D881;
+    padding: 9px 12px;
+    border-radius: 5px;
+    text-align: center;
 }
 
 .file a {
-    background: rgb(195, 85, 71);
+    background: #EA5A1D;
 }
 
 .file a:hover {
-    background: rgb(79, 1, 1);
+    background: #684638;
 }
 
 .links_stat ol li:nth-child(odd) {
-    background: rgb(231, 231, 231);
+    background: #1A2F26;
+}
+
+#drop-area:hover {
+    border-color: '#740303';
+    background: '#C35547';
+    color: 'white';
 }
 
 #drop-area {
-    width:300px;
+    width: 690px;
     height:100px;
     line-height:100px;
-    border: 5px dashed #F0A196;
+    border: 5px dashed #EA5A1D;
+    color: #EA5A1D;
     font-family: Monospace;
     font-size: 20px;
     text-align:center;
     border-radius: 5px;
-    margin-left: 124px;
-    margin-top: 5px;
+    margin-left: -72px;
+    margin-top: 15px;
+    cursor: pointer;
 }
 
 #urlbox:focus {
-    outline: 0;
-    box-shadow: 0 0 10px rgb(202, 209, 255);
-    border: 1px solid rgb(207, 207, 255);
+    outline: 0;   
+    box-shadow: 0 0 6px #00D881;
 }
 
 button {
-    border: 1px solid rgb(111, 111, 255);
-    background: white;
+    border: 1px solid #00D881;
     padding: 4px 10px;
     border-radius: 5px;
-    color: white;
-    background: rgb(111, 111, 255);
+    color: #141B18;
+    background: #00D881;
     cursor: pointer;
 }
 
 button:focus {
     outline: 0;
-    box-shadow: 0 0 6px rgb(111, 111, 255);
+    box-shadow: 0 0 6px #00D881;
 }
 
 button:hover {
-    background: rgb(79, 79, 210);
+    background: #267354;
+    color: #00D881;
 }
 
-#imagebox {
-    background: rgb(240, 161, 150);
-    color: white;
-    border-radius: 3px;
+#filebox {
+    display: none;
 }
+
+#imagebox:focus {
+    outline: 0;
+    box-shadow: 0 0 5px rgb(255, 109, 109);
+}
+
+h1 small {
+  display: inline-block;
+  width: 50px;
+  font-family: Arial;
+  font-weight: 200;
+  font-size: 20px;
+  color: rgb(20, 27, 24);
+  background: rgb(31, 204, 255);
+  text-shadow: none;
+  padding: 2px 6px;
+  border-radius: 5px;
+  margin-left: -5px;
+  transform: rotate(-13deg);
+  box-shadow: 0 0 15px rgb(31, 204, 255);
+}
+
+.clear-fix {
+    clear: both;
+}
+
+.paypal {
+    margin: auto;
+    width: 95px;
+    margin-top: 20px;
+}
+
+#last_links {
+    margin-left: 20px;
+    margin-right: 30px;
+}
+
+.description {
+    color: rgb(187, 69, 19);
+    font-family: Arial;
+    font-size: 10px;
+    text-align: center;
+    display: block;
+    margin-right: 80px;
+}
+
+.description:before {
+    content: "* ";
+    font-size: 14px;
+}
+
+.nothing-message {
+    display: block;
+    color: rgb(0, 216, 129);
+    text-align: center;
+}
+
+#urlbox::-webkit-input-placeholder {color:#149F67; font-size:12px;}
+#urlbox::-moz-placeholder          {color:#149F67; font-size:12px;} /* Firefox 19+ */
+#urlbox:-moz-placeholder           {color:#149F67; font-size:12px;} /* Firefox 18- */
+#urlbox:-ms-input-placeholder      {color:#149F67; font-size:12px;}
+
+#urlbox:focus::-webkit-input-placeholder {color: transparent}
+#urlbox:focus::-moz-placeholder          {color: transparent}
+#urlbox:focus:-moz-placeholder           {color: transparent}
+#urlbox:focus:-ms-input-placeholder      {color: transparent}

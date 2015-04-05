@@ -9,7 +9,7 @@ $(function(){
         }
     })
 
-    $('#imagebox').change(function () {
+    $('#filebox').change(function () {
         var file = $(this).prop('files')[0];
         uploadFile(file);
     })
@@ -19,7 +19,7 @@ $(function(){
 
         if (file.size < 30e6) {  
             data.append('cppt_file', file)
-            $('#urlbox').val('Uploading file...');
+            $('#drop-area').text('Uploading file...');
             $.ajax({
                 url: document.location.origin + "/api/uploadFile",
                 type: 'POST',
@@ -30,14 +30,18 @@ $(function(){
                 success: function (data) {
                     if (data.success) {
                         $('#urlbox').val('cppt.su/'+data.url);
+                        $('#drop-area').text('Link to your file ready!');
+                        setTimeout(function(){
+                            $('#drop-area').text('Drop file or click here for upload');
+                        }, 1000)
                     } else {
                         alert(data.message);
                     }
 
                     $('#drop-area').css({
-                        'border-color': '#F0A196',
+                        'border-color': '#EA5A1D',
                         background: 'none',
-                        color: 'black'
+                        color: '#EA5A1D'
                     });
                 }
             });
@@ -73,6 +77,11 @@ $(function(){
         $(v).text(moment(parseInt($(v).text())*1e3).fromNow());
     });
 
+    // Click Drop-Area to append file
+    $('#drop-area').click(function(){
+        $('#filebox').trigger('click');
+    })
+
     // File Drop-Area
     $('#drop-area').on('dragover', function(e) {
         e.preventDefault();
@@ -93,9 +102,9 @@ $(function(){
         e.preventDefault();
         e.stopPropagation();
         $(this).css({
-            'border-color': '#F0A196',
+            'border-color': '#EA5A1D',
             background: 'none',
-            color: 'black'
+            color: '#EA5A1D'
         });
     });
 

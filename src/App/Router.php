@@ -1,16 +1,19 @@
 <?php
 namespace App;
 
+use App\Session;
 use App\Db\Mongo;
 
 class Router {
 
     public static $fenom;
+    public static $session;
 
     public static function start() {
 
         Mongo::setDb('copypaste');
-
+        self::$session = Session::getSession();
+        
         self::$fenom = \Fenom::factory('../templates', '../templates/cache', [
             'force_compile' => true,
             'strip' => true

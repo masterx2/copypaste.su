@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Router;
 use App\Db\Mongo;
 
 class Api {
@@ -14,6 +15,7 @@ class Api {
                 'original_url' => urlencode($url),
                 'url' => self::id2url($id),
                 'id' => $id,
+                'sid' => Router::$session,
                 'click_count' => 0,
                 'last_click' => new \MongoDate() 
             ]);
@@ -44,18 +46,6 @@ class Api {
         }
     }
 
-    public static function getLastLinks($num) {
-        $result = Mongo::find('links', [], ['_id' => -1], $num);
-        if ($result) {
-            return [
-                'success' => true,
-                'data' => Mongo::clearMongo($result)
-            ];
-        } else {
-            return self::_error('Something wrong');
-        }
-    }
-
     public static function uploadFile() {
         $file = $_FILES['cppt_file'];
         if ($file['error'] == 0) {
@@ -63,7 +53,7 @@ class Api {
             if (isset($key, $url)) {
                 $headers = [
                     "X-Auth-Token: $key",
-                    "X-Delete-After: 604 800"
+                    "X-Delete-After: 604800"
                 ];
                 $real_filename = urlencode($file['name']);
                 $file_res = fopen($file['tmp_name'], 'r');
@@ -151,13 +141,11 @@ class Api {
             preg_match('/^([A-Z]+)\/([0-9.]{3,5}) ([0-9]{3}) (.+)$/', $status, $preg_result);
             array_shift($preg_result);
             list($protocol_type, $protocol_version, $status_code, $status_message) = $preg_result;
-
-            // HTTP/1.1 100 Continue\r\n
-            if (intval($status_code) == 100) {
-                return self::parseHeader(implode("\n",array_filter($raw_headers)));
-            }
-
             if (isset($protocol_type, $protocol_version, $status_code, $status_message)) {
+                // HTTP/1.1 100 Continue
+                if (intval($status_code) == 100) {
+                    return self::parseHeader(implode("\n",array_filter($raw_headers)));
+                }
                 $headers = array_reduce($raw_headers, function($accum, $item) {
                     $accum[strstr($item, ': ', true)] = trim(substr(strstr($item, ': '), 2));
                     return $accum;
@@ -180,7 +168,7 @@ class Api {
     }
 
     public static function getTopLinks($num) {
-        $result = Mongo::find('links', [], ['click_count' => -1], $num);
+        $result = Mongo::find('links', ['sid' => Router::$session], ['click_count' => -1], $num);
         if ($result) {
             return [
                 'success' => true,
@@ -190,6 +178,19 @@ class Api {
             return self::_error('Something wrong');
         }
     }
+
+    public static function getLastLinks($num) {
+        $result = Mongo::find('links', ['sid' => Router::$session], ['_id' => -1], $num);
+        if ($result) {
+            return [
+                'success' => true,
+                'data' => Mongo::clearMongo($result)
+            ];
+        } else {
+            return self::_error('Something wrong');
+        }
+    }
+
 
     public static function id2url($id) {
         return self::convBase($id, '0123456789', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
