@@ -10,20 +10,19 @@ class Router {
     public static $session;
 
     public static function start() {
-
         Mongo::setDb('copypaste');
         self::$session = Session::getSession();
-        
         self::$fenom = \Fenom::factory('../templates', '../templates/cache', [
             'force_compile' => true,
             'strip' => true
         ]);
         
         if (isset($_GET['link'])) {
+            $pin = isset($_GET['pin']) ? intval(substr($_GET['pin'], 1)) : null;
             $id = $_GET['link'];
             // Обработка короткой ссылки
             // link не может быть пустым, так что можно не проверять
-            Api::followShortUrl($id);
+            Api::followShortUrl($id, $pin);
 
         } else if (isset($_GET['url'])) {
             $url = $_GET['url'];
@@ -39,10 +38,13 @@ class Router {
                         break;
                     case 'api/uploadFile':
                         // Загружаем
-                        Api::uploadFile();
+                        Api::processFiles();
                         break;
                     case 'api/debug':
                         // Дебаг методов
+                        break;
+                    case 'api/pin':
+                        self::pinPage();
                         break;
                     default:
                         // Для дебага
@@ -60,12 +62,32 @@ class Router {
 
     public static function indexPage() {
         // Две выборки, последнии ссылки и топ-ссылок по 10 штук
-        $last_links = Api::getLastLinks(10)['data'];
-        $top_links = Api::getTopLinks(10)['data'];
+        $top_links = Api::getTopLinks(10);
+        $last_links = Api::getLastLinks(10);
 
         self::$fenom->display('index.tpl',[
-            'last_links' => $last_links,
-            'top_links' => $top_links
+            'top_links' => $top_links['success'] ? $top_links['data'] : [],
+            'last_links' => $last_links['success'] ? $last_links['data'] : []
         ]);
+    }
+
+    public static function pinPage() {
+        $id = isset($_GET['id']) ? intval($_GET['id']) : false;
+        if (!$id) {
+            header("Location: http://copypaste.su");
+            die();
+        }
+        
+        $link = Mongo::findOne('links', ['id' => $id]);
+
+        if ($link) {
+            self::$fenom->display('pin.tpl',[
+                'link' => $link
+            ]);
+        } else {
+            self::$fenom->display('link_not_found.tpl',[
+                'id' => $id
+            ]);
+        }
     }
 }

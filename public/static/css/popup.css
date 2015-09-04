@@ -1,0 +1,54 @@
+.message {
+    padding: 20px;
+    color: rgb(68, 68, 68);
+    text-shadow: 0 0 3px rgb(123, 123, 123);
+    font-size: 21px;
+    text-align: justify;
+    background: rgb(255, 255, 255);
+}
+
+.message h4 {
+    margin: 0;
+    text-align: center;
+}
+
+.controls input[type="text"] {
+    width: 281px;
+    height: 15px;
+    border: 0;
+    border-radius: 5px;
+    background: rgb(200, 200, 200);
+    padding: 10px;
+}
+
+.controls {
+    padding: 15px;
+    background: rgb(11, 171, 117);
+}
+
+.controls button {
+    background: rgb(0, 255, 90);
+    margin-left: 12px;
+    padding: 8px;
+    border: 1px solid rgb(218, 245, 255);
+    border-radius: 5px;
+    color: rgb(61, 65, 28);
+    cursor: pointer;
+    width: 150px;
+}
+
+.controls button:hover {
+    background: red;
+    color: wheat;
+}
+
+.controls input[type="text"]:focus {
+    outline: 0;
+    box-shadow: 0 0 5px black;
+}
+
+.message img {
+    margin-left: 109px;
+    cursor: pointer;
+    margin-top: -20px;
+}

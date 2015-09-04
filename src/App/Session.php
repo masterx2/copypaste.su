@@ -52,7 +52,7 @@ class Session {
     private static function generateSessionID() {
         return md5(
             $_SERVER['HTTP_USER_AGENT']
-            .'THIS_IS_SALT'
+            .'g_85hD=F%$#GHF+D#aert4356bgdfs345%#$43f_&54w_6w4356gw4552^4354465_gw4'
             .$_SERVER['REMOTE_ADDR']
         ).uniqid();
     }

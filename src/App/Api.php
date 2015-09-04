@@ -6,24 +6,33 @@ use App\Router;
 use App\Db\Mongo;
 
 class Api {
-    public static function getShortUrl($type, $raw_url=null) {
+
+    protected static $api_key;
+    protected static $api_url;
+
+    public static function getShortUrl($type, $raw_url=null, $extra_data=null) {
         if (isset($_POST['url']) || isset($raw_url)) {
             $id = Mongo::getNextSequence('link');
             $url = isset($raw_url) ? $raw_url : $_POST['url'];
+            $pin = isset($_POST['secure']) && $_POST['secure'] != 'false' ? substr(mt_rand(10000,20000), 1) : false;
+
             $result = Mongo::insert('links', [
                 'type' => $type,
                 'original_url' => urlencode($url),
                 'url' => self::id2url($id),
                 'id' => $id,
                 'sid' => Router::$session,
+                'extra_data' => $extra_data,
                 'click_count' => 0,
-                'last_click' => new \MongoDate() 
+                'last_click' => new \MongoDate(),
+                'pin' => $pin
             ]);
 
             self::ajaxResponse([
+                'id' => $id,
                 'success' => true,
                 'url' => self::id2url($id),
-                'id' => $id
+                'pin' => $pin
             ]);
 
         } else {
@@ -31,7 +40,7 @@ class Api {
         }
     }
 
-    public static function followShortUrl($url) {
+    public static function followShortUrl($url, $pin) {
         $result = Mongo::findAndModify('links', [
                 'url' => $url
             ], [
@@ -40,47 +49,90 @@ class Api {
         ]);
 
         if ($result) {
+            if (!empty($result['pin'])) {
+                if (intval($result['pin']) != $pin) {
+                    header("Location: http://copypaste.su/api/pin?id=".$result['id']);
+                    die();
+                }
+            }
             $url = urldecode($result['original_url']);
             header("Location: $url");
             die();
         }
     }
 
-    public static function uploadFile() {
-        $file = $_FILES['cppt_file'];
-        if ($file['error'] == 0) {
-            list($key, $url) = self::getApiParams();
-            if (isset($key, $url)) {
-                $headers = [
-                    "X-Auth-Token: $key",
-                    "X-Delete-After: 604800"
-                ];
-                $real_filename = urlencode($file['name']);
-                $file_res = fopen($file['tmp_name'], 'r');
-                $options = [
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_HEADER         => true,
-                    CURLOPT_PUT            => true,
-                    CURLOPT_INFILE         => $file_res,
-                    CURLOPT_INFILESIZE     => $file['size']
-                ];
-
-                $upload_url = $url.'Storage/'.$real_filename;
-                $response = self::parseHeader(
-                    self::HTTP($upload_url, $headers, $options)
-                );
-                fclose($file_res);
-                
-                if (isset($response['error'])) {
-                    self::ajaxResponse(self::_error('Error parsing response from hosting: '.$response['error']));
-                } else if ($response['status'] == 201) {
-                    self::getShortUrl('file', $upload_url);
+    public static function processFiles() {
+        if (self::getApiParams()) {
+            if (isset($_FILES['cppt_file'])) {
+                $files_error = $_FILES['cppt_file']['error'];
+                $file_index = 0;
+                $filename = count($files_error) == 1 ? $_FILES['cppt_file']['name'][0] : (string)count($files_error).'_files_'.uniqid();                 
+                if (isset($_POST['zip']) && $_POST['zip'] == 1) {    
+                    $zipfile = "/tmp/".$filename.".zip";
+                    $zip = new \ZipArchive();
+                    if ($zip->open($zipfile, \ZipArchive::CREATE)) {
+                        foreach ($files_error as $err) {
+                            if ($err == 0) {
+                                $files_props[] = [
+                                    'name' => $_FILES['cppt_file']['name'][$file_index],
+                                    'size' => $_FILES['cppt_file']['size'][$file_index]
+                                ];
+                                $zip->addFile($_FILES['cppt_file']['tmp_name'][$file_index],
+                                              $_FILES['cppt_file']['name'][$file_index]);
+                            }
+                            $file_index += 1;
+                        }
+                        $zip->close();
+                        self::uploadToStorage([
+                            'path' => $zipfile,
+                            'name' => $filename.'.zip',
+                            'size' => filesize($zipfile)
+                        ], 'zip', $files_props);
+                    } else {
+                        self::ajaxResponse(self::_error('Can\'t create zip!'));
+                    }
+                } else {
+                    self::uploadToStorage([
+                        'path' => $_FILES['cppt_file']['tmp_name'][0],
+                        'name' => $_FILES['cppt_file']['name'][0],
+                        'size' => $_FILES['cppt_file']['size'][0]
+                    ]);
                 }
             } else {
-                self::ajaxResponse(self::_error('Can\'t get storage api key!'));
+                self::ajaxResponse(self::_error('File(s) not found!'));
             }
         } else {
-            self::ajaxResponse(self::_error('Upload Error!'));
+            self::ajaxResponse(self::_error('Can\'t get storage api key!'));
+        }
+    }
+
+
+    public static function uploadToStorage($file, $type='file', $files_props=null) {
+        $headers = [
+            "X-Auth-Token: ".self::$api_key
+            // "X-Delete-After: 604800"
+        ];
+        $real_filename = urlencode($file['name']);
+        $file_res = fopen($file['path'], 'r');
+        $options = [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER         => true,
+            CURLOPT_PUT            => true,
+            CURLOPT_INFILE         => $file_res,
+            CURLOPT_INFILESIZE     => $file['size']
+        ];
+
+        $upload_url = self::$api_url.'Storage/'.$real_filename;
+        $response = self::parseHeader(
+            self::HTTP($upload_url, $headers, $options)
+        );
+        fclose($file_res);
+
+        if (isset($response['error'])) {
+            self::ajaxResponse(self::_error('Error parsing response from hosting: '.$response['error']));
+        } else if ($response['status'] == 201) {
+            self::getShortUrl($type, 'http://storage.copypaste.su/'.$real_filename, $files_props);
+            unlink($file['path']);
         }
     }
 
@@ -116,7 +168,9 @@ class Api {
                 }
             }
         }
-        return [$auth_key, $auth_url];
+        self::$api_key = $auth_key;
+        self::$api_url = $auth_url;
+        return true;
     }
 
     public static function HTTP($url, $headers=[], $custom_options=[]) {
@@ -169,7 +223,7 @@ class Api {
 
     public static function getTopLinks($num) {
         $result = Mongo::find('links', ['sid' => Router::$session], ['click_count' => -1], $num);
-        if ($result) {
+        if (!empty($result)) {
             return [
                 'success' => true,
                 'data' => Mongo::clearMongo($result)
@@ -181,7 +235,7 @@ class Api {
 
     public static function getLastLinks($num) {
         $result = Mongo::find('links', ['sid' => Router::$session], ['_id' => -1], $num);
-        if ($result) {
+        if (!empty($result)) {
             return [
                 'success' => true,
                 'data' => Mongo::clearMongo($result)
@@ -190,7 +244,6 @@ class Api {
             return self::_error('Something wrong');
         }
     }
-
 
     public static function id2url($id) {
         return self::convBase($id, '0123456789', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
@@ -239,8 +292,11 @@ class Api {
     }
 
     public static function ajaxResponse($response) {
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: POST');
+        header('Access-Control-Max-Age: 1000');
         header('Content-Type: application/json');
-        print json_encode($response);
+        echo json_encode($response);
     }
 
     public static function _error($message) {
