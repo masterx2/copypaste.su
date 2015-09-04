@@ -6,10 +6,17 @@ use App\Router;
 use App\Db\Mongo;
 
 class Api {
-
+    /** @var string */
     protected static $api_key;
+    /** @var string */
     protected static $api_url;
 
+    /**
+     * Генерирует коротку ссылку
+     * @param string $type тип ссылки
+     * @param null $raw_url
+     * @param null $extra_data
+     */
     public static function getShortUrl($type, $raw_url=null, $extra_data=null) {
         if (isset($_POST['url']) || isset($raw_url)) {
             $id = Mongo::getNextSequence('link');

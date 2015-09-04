@@ -1,0 +1,14 @@
+{
+  "redis": {
+    "host": "localhost",
+    "port": 6379,
+    "timeout": 100,
+    "autoconnect": true
+  },
+  "mongo": {
+    "host" : "localhost",
+    "port" : 27017,
+    "database" : "copypaste"
+  },
+  "log": "copypaste.log"
+}

@@ -1,6 +1,12 @@
 {
     "require": {
-        "fenom/fenom": "dev-master"
+        "fenom/fenom": "dev-master",
+        "hassankhan/config": "^0.8.2",
+        "symfony/http-foundation": "^2.7",
+        "monolog/monolog": "^1.16",
+        "kriswallsmith/buzz": "^0.15.0",
+        "phpwhois/idna-convert": "^0.9.0",
+        "geometria-lab/rediska": "^0.5.10"
     },
     "autoload": {
         "psr-0": {"App\\": "src/"}
